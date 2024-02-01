@@ -88,3 +88,20 @@ fastlane/test_output
 # https://github.com/johnno1962/injectionforxcode
 
 iOSInjectionProject/
+
+# Bazel
+.bazelrc.user
+/bazel-*
+
+# Common
+**/xcuserdata/
+.DS_Store
+*.dSYM.zip
+*.ipa
+*.xcuserstate
+*.xcodeproj
+*.xcworkspace
+*.d
+*.dia
+*.o
+*.orig

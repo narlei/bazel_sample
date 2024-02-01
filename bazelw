@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# https://github.com/bazelbuild/apple_support#toolchain-configuration
+# https://github.com/bazelbuild/bazel/issues/14551#issuecomment-1010288518
+if [ -z "$DEVELOPER_DIR" ]; then
+  export DEVELOPER_DIR=$(xcode-select -p)
+fi
+
+if [[ "$DEVELOPER_DIR" != /Applications/* ]]; then
+  echo "error: Xcode must be installed in /Applications/, not '$DEVELOPER_DIR'" >&2
+  exit 1
+fi
+
+# Only startup flags are allowed here
+flags=()
+
+# Restart bazel server if `DEVELOPER_DIR` changes to clear `developerDirCache`
+# This is necessary to invalidate Bazel internal cache when switching Xcode versions
+# https://bazelbuild.slack.com/archives/CD3QY5C2X/p1681824007249159?thread_ts=1681499279.013309&cid=CD3QY5C2X
+flags+=("--host_jvm_args=-Xdock:name=$DEVELOPER_DIR")
+
+# Shutdown Bazel Server after some minutes to avoid unnecessary Java processes lingering for too long
+# Ideally, we would set this flags in xcodeproj.bazelrc, but .bazelrc overwrites values from xcodeproj.bazelrc
+# The argument --output_base is what spawns a new Bazel Server, so it should be ok to check against it.
+if [[ "$@" =~ --output_base.*\/indexbuild_output_base ]]; then
+  # For Bazel spawned by rules_xcodeproj when indexing
+  flags+=("--max_idle_secs=300")
+elif [[ "$@" =~ --output_base.*\/build_output_base ]]; then
+  # For Bazel spawned by rules_xcodeproj when building
+  flags+=("--max_idle_secs=600")
+fi
+
+W_BAZEL_BIN=$CONSUMER_BAZEL_PATH
+
+if [ -n "$W_BAZEL_BIN" ]; then
+  echo "Using Bazel from path $W_BAZEL_BIN"
+else
+  W_BAZEL_BIN=bazelisk
+  if ! command -v ${W_BAZEL_BIN} >/dev/null; then
+    bazelisk_install_cmd="brew install bazelisk"
+    echo "bazelisk not found, let me run '$bazelisk_install_cmd' for you..."
+    $bazelisk_install_cmd
+
+    if ! command -v ${W_BAZEL_BIN} >/dev/null; then
+      echo "error: Please install bazelisk with '$bazelisk_install_cmd'" >&2
+      exit 1
+    fi
+  fi
+fi
+
+exec "$W_BAZEL_BIN" "${flags[@]}" "$@"
