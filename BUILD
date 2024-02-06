@@ -19,7 +19,8 @@ swift_library(
     srcs = glob(["App/**/*.swift"]),
     visibility = ["//visibility:public"],
     deps = [
-        "//Libraries/LibraryA:LibraryA",
+        "//Libraries/LibraryA:LibraryACore",
+        "//Libraries/LibraryA:LibraryAInterface",
         "//Libraries/LibraryB:LibraryB",
         "//Libraries/LibraryC:LibraryC",
         "//Libraries/LibraryD:LibraryD",
@@ -63,7 +64,8 @@ XCODEPROJ_TEST_TARGETS = [
 
 XCODEPROJ_FOCUSED_TARGETS = [
     "//:MyApp",
-    "//Libraries/LibraryA:LibraryA",
+    "//Libraries/LibraryA:LibraryACore",
+    "//Libraries/LibraryA:LibraryAInterface",
     "//Libraries/LibraryB:LibraryB",
     "//Libraries/LibraryC:LibraryC",
     "//Libraries/LibraryD:LibraryD",
@@ -79,13 +81,15 @@ XCODEPROJ_EXAMPLE_APPS = [
 SCHEMES = [
     xcschemes.scheme(
         name = "ProjectSample",
+        profile = None,
         run = xcschemes.run(
             build_targets = [
             ],
             launch_target = xcschemes.launch_target(
                 "//:MyApp",
                 library_targets = [
-                    "//Libraries/LibraryA:LibraryA",
+                    "//Libraries/LibraryA:LibraryACore",
+                    "//Libraries/LibraryA:LibraryAInterface",
                     "//Libraries/LibraryB:LibraryB",
                     "//Libraries/LibraryC:LibraryC",
                     "//Libraries/LibraryD:LibraryD",
@@ -98,12 +102,27 @@ SCHEMES = [
                 ]
             ),
         ),
-        # test = xcschemes.test(
-        #     args = ["--command_line_args=-AppleLanguages,(pt-BR),-AppleLocale,pt_BR"],
-        #     env = {"TZ": "BRL"},  # Never leave empty, env is needed to inherit the rules_xcodeproj envs to run snapshot tests
-        #     test_targets = [
-        #     ],
-        # ),
+    ),
+
+    xcschemes.scheme(
+        name = "Library_A",
+        profile = None,
+        run = xcschemes.run(
+            build_targets = [
+            ],
+            launch_target = xcschemes.launch_target(
+                library_targets = [
+                    "//Libraries/LibraryA:LibraryACore",
+                    "//Libraries/LibraryA:LibraryAInterface",
+                ],
+                post_actions = [
+                    xcschemes.pre_post_actions.build_script(title = "This is a post_action", script_text = "echo 'Bye'")
+                ],
+                pre_actions = [
+                    xcschemes.pre_post_actions.build_script(title = "This is a pre_action", script_text = "echo 'Hi'")
+                ]
+            ),
+        ),
     ),
 ]
 
