@@ -13,9 +13,9 @@ apple_resource_group(
 
 
 swift_library(
-    name = "BaseSource",
+    name = "MySampleSource",
     tags = ["manual"],
-    module_name = "BaseSource",
+    module_name = "MySampleSource",
     srcs = glob(["App/**/*.swift"]),
     visibility = ["//visibility:public"],
     deps = [
@@ -35,7 +35,7 @@ apple_bundle_version(
 )
 
 ios_application(
-    name = "MyApp",
+    name = "MySampleApp",
     bundle_id = "com.narlei.sample",
     families = [
         "iphone",
@@ -43,7 +43,7 @@ ios_application(
     ],
     infoplists = ["App/Info.plist"],
     deps = [
-        ":BaseSource",
+        ":MySampleSource",
     ],
     minimum_os_version = "16.0",
     visibility = ["//visibility:public"],
@@ -63,19 +63,20 @@ XCODEPROJ_TEST_TARGETS = [
 ]
 
 XCODEPROJ_FOCUSED_TARGETS = [
-    "//:MyApp",
+    "//:MySampleApp", # Comment this line to simulate working without the app on focus targets
     "//Libraries/LibraryA:LibraryACore",
     "//Libraries/LibraryA:LibraryAInterface",
     "//Libraries/LibraryB:LibraryB",
     "//Libraries/LibraryC:LibraryC",
     "//Libraries/LibraryD:LibraryD",
+    "//:MySampleSource",
 ]
 
 XCODEPROJ_UNFOCUSED_TARGETS = [
 ]
 
 XCODEPROJ_EXAMPLE_APPS = [
-    top_level_target("//:MyApp", target_environments = ["simulator"])
+    top_level_target("//:MySampleApp", target_environments = ["simulator"])
 ]
 
 SCHEMES = [
@@ -85,7 +86,7 @@ SCHEMES = [
         run = xcschemes.run(
             build_targets = [
                 xcschemes.top_level_anchor_target(
-                    label = "//:MyApp",
+                    label = "//:MySampleApp",
                     library_targets = [
                         xcschemes.library_target("//Libraries/LibraryA:LibraryACore",
                             post_actions = [
@@ -95,6 +96,7 @@ SCHEMES = [
                                 xcschemes.pre_post_actions.build_script(title = "This is a pre_action", script_text = "echo 'Hi'")
                             ]
                         ),
+                        "//:MySampleSource",
                         "//Libraries/LibraryA:LibraryAInterface",
                         "//Libraries/LibraryB:LibraryB",
                         "//Libraries/LibraryC:LibraryC",
@@ -102,8 +104,9 @@ SCHEMES = [
                     ],
                 )
             ],
+            # Comment the launch_target to simulate working without the app on focus targets
             launch_target = xcschemes.launch_target(
-                "//:MyApp"
+                "//:MySampleApp"
             ),
         ),
     ),
@@ -114,7 +117,7 @@ SCHEMES = [
         run = xcschemes.run(
             build_targets = [
                 xcschemes.top_level_anchor_target(
-                    label = "//:MyApp",
+                    label = "//:MySampleApp",
                     library_targets = [
                         xcschemes.library_target("//Libraries/LibraryA:LibraryACore",
                             post_actions = [
