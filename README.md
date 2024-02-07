@@ -1,6 +1,6 @@
 # This is a rules_xcodeproj Sample
 
-To run the project just checkout the main branch and run
+To run the project just checkout the `bug/application_direct_dependency` branch and run
 
 ```
 make create_project
