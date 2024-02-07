@@ -31,15 +31,15 @@ tools/generators/xcschemes/src/Generator/CreateCustomSchemeInfos.swift:461: Run 
 
 We're creating an `ios_application` with a dependency:
 
-https://github.com/narlei/bazel_sample/blob/17ffe7284ca411f532194b991dd105fe30455dde/BUILD#L37-L52
+https://github.com/narlei/bazel_sample/blob/c545b1bfa97c48b1728b31de83a9cef2a2900a9b/BUILD#L33-L48
 
 The `MySampleSource` contains the app dependencies:
 
-https://github.com/narlei/bazel_sample/blob/17ffe7284ca411f532194b991dd105fe30455dde/BUILD#L15-L28
+https://github.com/narlei/bazel_sample/blob/c545b1bfa97c48b1728b31de83a9cef2a2900a9b/BUILD#L14-L24
 
 The bug is when I'm trying to focus on the `MySampleSource` and on `MySampleApp`:
 
-https://github.com/narlei/bazel_sample/blob/17ffe7284ca411f532194b991dd105fe30455dde/BUILD#L65-L73
+https://github.com/narlei/bazel_sample/blob/c545b1bfa97c48b1728b31de83a9cef2a2900a9b/BUILD#L52-L57
 
 ```
 ERROR: Internal precondition failure:
@@ -50,10 +50,10 @@ tools/generators/xcschemes/src/Generator/CreateCustomSchemeInfos.swift:461: Run 
 The rules_xcodeproj isn't finding the `MySampleSource` on the target lists.
 This is a target of a xcscheme:
 
-https://github.com/narlei/bazel_sample/blob/17ffe7284ca411f532194b991dd105fe30455dde/BUILD#L82-L112
+https://github.com/narlei/bazel_sample/blob/c545b1bfa97c48b1728b31de83a9cef2a2900a9b/BUILD#L59-L80
 
 Removing the `MySampleApp` from the focus list (and from the `launch_target`) works without errors, finding the `MySampleSource`, but it creates a xscheme without the launch app.
 
-https://github.com/narlei/bazel_sample/blob/17ffe7284ca411f532194b991dd105fe30455dde/BUILD#L107-L110
+https://github.com/narlei/bazel_sample/blob/c545b1bfa97c48b1728b31de83a9cef2a2900a9b/BUILD#L53
 
-https://github.com/narlei/bazel_sample/blob/17ffe7284ca411f532194b991dd105fe30455dde/BUILD#L65-L66
+https://github.com/narlei/bazel_sample/blob/c545b1bfa97c48b1728b31de83a9cef2a2900a9b/BUILD#L74-L77
