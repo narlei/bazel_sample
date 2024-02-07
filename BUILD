@@ -53,15 +53,6 @@ ios_application(
 
 ######## Project ##########
 
-XCODEPROJ_FRAMEWORK_TARGETS = [
-]
-
-XCODEPROJ_ASSOCIATED_EXTRA_FILES = {
-}
-
-XCODEPROJ_TEST_TARGETS = [
-]
-
 XCODEPROJ_FOCUSED_TARGETS = [
     "//:MySampleApp", # Comment this line to simulate working without the app on focus targets
     "//Libraries/LibraryA:LibraryACore",
@@ -70,9 +61,6 @@ XCODEPROJ_FOCUSED_TARGETS = [
     "//Libraries/LibraryC:LibraryC",
     "//Libraries/LibraryD:LibraryD",
     "//:MySampleSource",
-]
-
-XCODEPROJ_UNFOCUSED_TARGETS = [
 ]
 
 XCODEPROJ_EXAMPLE_APPS = [
@@ -88,14 +76,7 @@ SCHEMES = [
                 xcschemes.top_level_anchor_target(
                     label = "//:MySampleApp",
                     library_targets = [
-                        xcschemes.library_target("//Libraries/LibraryA:LibraryACore",
-                            post_actions = [
-                                xcschemes.pre_post_actions.build_script(title = "This is a post_action", script_text = "echo 'Bye'")
-                            ],
-                            pre_actions = [
-                                xcschemes.pre_post_actions.build_script(title = "This is a pre_action", script_text = "echo 'Hi'")
-                            ]
-                        ),
+                        "//Libraries/LibraryA:LibraryACore",
                         "//:MySampleSource",
                         "//Libraries/LibraryA:LibraryAInterface",
                         "//Libraries/LibraryB:LibraryB",
@@ -108,29 +89,6 @@ SCHEMES = [
             launch_target = xcschemes.launch_target(
                 "//:MySampleApp"
             ),
-        ),
-    ),
-
-    xcschemes.scheme(
-        name = "Library_A",
-        profile = None,
-        run = xcschemes.run(
-            build_targets = [
-                xcschemes.top_level_anchor_target(
-                    label = "//:MySampleApp",
-                    library_targets = [
-                        xcschemes.library_target("//Libraries/LibraryA:LibraryACore",
-                            post_actions = [
-                                xcschemes.pre_post_actions.build_script(title = "This is a post_action", script_text = "echo 'Bye'")
-                            ],
-                            pre_actions = [
-                                xcschemes.pre_post_actions.build_script(title = "This is a pre_action", script_text = "echo 'Hi'")
-                            ]
-                        ),
-                        "//Libraries/LibraryA:LibraryAInterface",
-                    ],
-                )
-            ],
         ),
     ),
 ]
@@ -147,7 +105,6 @@ xcodeproj(
     project_name = "BazelSample",
     xcschemes = SCHEMES,
     tags = ["manual"],
-    top_level_targets = XCODEPROJ_TEST_TARGETS + XCODEPROJ_EXAMPLE_APPS + XCODEPROJ_FRAMEWORK_TARGETS,
-    unfocused_targets = XCODEPROJ_UNFOCUSED_TARGETS,
+    top_level_targets = XCODEPROJ_EXAMPLE_APPS,
     generation_mode = "incremental",
 )
