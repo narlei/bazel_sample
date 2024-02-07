@@ -84,22 +84,26 @@ SCHEMES = [
         profile = None,
         run = xcschemes.run(
             build_targets = [
+                xcschemes.top_level_anchor_target(
+                    label = "//:MyApp",
+                    library_targets = [
+                        xcschemes.library_target("//Libraries/LibraryA:LibraryACore",
+                            post_actions = [
+                                xcschemes.pre_post_actions.build_script(title = "This is a post_action", script_text = "echo 'Bye'")
+                            ],
+                            pre_actions = [
+                                xcschemes.pre_post_actions.build_script(title = "This is a pre_action", script_text = "echo 'Hi'")
+                            ]
+                        ),
+                        "//Libraries/LibraryA:LibraryAInterface",
+                        "//Libraries/LibraryB:LibraryB",
+                        "//Libraries/LibraryC:LibraryC",
+                        "//Libraries/LibraryD:LibraryD",
+                    ],
+                )
             ],
             launch_target = xcschemes.launch_target(
-                "//:MyApp",
-                library_targets = [
-                    "//Libraries/LibraryA:LibraryACore",
-                    "//Libraries/LibraryA:LibraryAInterface",
-                    "//Libraries/LibraryB:LibraryB",
-                    "//Libraries/LibraryC:LibraryC",
-                    "//Libraries/LibraryD:LibraryD",
-                ],
-                post_actions = [
-                    xcschemes.pre_post_actions.build_script(title = "This is a post_action", script_text = "echo 'Bye'")
-                ],
-                pre_actions = [
-                    xcschemes.pre_post_actions.build_script(title = "This is a pre_action", script_text = "echo 'Hi'")
-                ]
+                "//:MyApp"
             ),
         ),
     ),
@@ -109,19 +113,21 @@ SCHEMES = [
         profile = None,
         run = xcschemes.run(
             build_targets = [
+                xcschemes.top_level_anchor_target(
+                    label = "//:MyApp",
+                    library_targets = [
+                        xcschemes.library_target("//Libraries/LibraryA:LibraryACore",
+                            post_actions = [
+                                xcschemes.pre_post_actions.build_script(title = "This is a post_action", script_text = "echo 'Bye'")
+                            ],
+                            pre_actions = [
+                                xcschemes.pre_post_actions.build_script(title = "This is a pre_action", script_text = "echo 'Hi'")
+                            ]
+                        ),
+                        "//Libraries/LibraryA:LibraryAInterface",
+                    ],
+                )
             ],
-            launch_target = xcschemes.launch_target(
-                library_targets = [
-                    "//Libraries/LibraryA:LibraryACore",
-                    "//Libraries/LibraryA:LibraryAInterface",
-                ],
-                post_actions = [
-                    xcschemes.pre_post_actions.build_script(title = "This is a post_action", script_text = "echo 'Bye'")
-                ],
-                pre_actions = [
-                    xcschemes.pre_post_actions.build_script(title = "This is a pre_action", script_text = "echo 'Hi'")
-                ]
-            ),
         ),
     ),
 ]
