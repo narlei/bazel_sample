@@ -1,30 +1,26 @@
 load("@build_bazel_rules_apple//apple:ios.bzl", "ios_application")
-load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
-load("@build_bazel_rules_apple//apple:versioning.bzl", "apple_bundle_version")
 load("@build_bazel_rules_apple//apple:resources.bzl", "apple_resource_group")
-load("@rules_xcodeproj//xcodeproj:defs.bzl", "top_level_target", "xcschemes", "xcodeproj")
+load("@build_bazel_rules_apple//apple:versioning.bzl", "apple_bundle_version")
+load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
+load("@rules_xcodeproj//xcodeproj:defs.bzl", "top_level_target", "xcodeproj", "xcschemes")
 
 apple_resource_group(
     name = "PerformanceTestAppAssets",
     resources = glob(["App/**/*.xcassets/**/*"]) + glob(["App/**/*.storyboard"]),
-    visibility = ["//visibility:public"],
     tags = ["manual"],
+    visibility = ["//visibility:public"],
 )
-
 
 swift_library(
     name = "MySampleSource",
-    tags = ["manual"],
-    module_name = "MySampleSource",
     srcs = glob(["App/**/*.swift"]),
+    module_name = "MySampleSource",
+    tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = [
         "//Libraries/LibraryA:LibraryACore",
         "//Libraries/LibraryA:LibraryAInterface",
-        "//Libraries/LibraryB:LibraryB",
-        "//Libraries/LibraryC:LibraryC",
-        "//Libraries/LibraryD:LibraryD",
-    ]
+    ],
 )
 
 apple_bundle_version(
@@ -42,29 +38,22 @@ ios_application(
         "ipad",
     ],
     infoplists = ["App/Info.plist"],
+    minimum_os_version = "16.0",
+    resources = [":PerformanceTestAppAssets"],
+    version = ":BazelSampleVersion",
+    visibility = ["//visibility:public"],
     deps = [
         ":MySampleSource",
     ],
-    minimum_os_version = "16.0",
-    visibility = ["//visibility:public"],
-    resources = [":PerformanceTestAppAssets"],
-    version = ":BazelSampleVersion",
 )
 
 ######## Project ##########
 
 XCODEPROJ_FOCUSED_TARGETS = [
-    "//:MySampleApp", # Comment this line to simulate working without the app on focus targets
+    "//:MySampleApp",  # Comment this line to simulate working without the app on focus targets
+    "//:MySampleSource",
     "//Libraries/LibraryA:LibraryACore",
     "//Libraries/LibraryA:LibraryAInterface",
-    "//Libraries/LibraryB:LibraryB",
-    "//Libraries/LibraryC:LibraryC",
-    "//Libraries/LibraryD:LibraryD",
-    "//:MySampleSource",
-]
-
-XCODEPROJ_EXAMPLE_APPS = [
-    top_level_target("//:MySampleApp", target_environments = ["simulator"])
 ]
 
 SCHEMES = [
@@ -76,18 +65,15 @@ SCHEMES = [
                 xcschemes.top_level_anchor_target(
                     label = "//:MySampleApp",
                     library_targets = [
-                        "//Libraries/LibraryA:LibraryACore",
                         "//:MySampleSource",
+                        "//Libraries/LibraryA:LibraryACore",
                         "//Libraries/LibraryA:LibraryAInterface",
-                        "//Libraries/LibraryB:LibraryB",
-                        "//Libraries/LibraryC:LibraryC",
-                        "//Libraries/LibraryD:LibraryD",
                     ],
-                )
+                ),
             ],
             # Comment the launch_target to simulate working without the app on focus targets
             launch_target = xcschemes.launch_target(
-                "//:MySampleApp"
+                "//:MySampleApp",
             ),
         ),
     ),
@@ -95,16 +81,20 @@ SCHEMES = [
 
 xcodeproj(
     name = "xcodeproj",
-    associated_extra_files = XCODEPROJ_ASSOCIATED_EXTRA_FILES,
     bazel_env = {
         "PATH": "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin",
     },
-    build_mode = "bazel",
     bazel_path = "./bazelw",
+    build_mode = "bazel",
     focused_targets = XCODEPROJ_FOCUSED_TARGETS,
-    project_name = "BazelSample",
-    xcschemes = SCHEMES,
-    tags = ["manual"],
-    top_level_targets = XCODEPROJ_EXAMPLE_APPS,
     generation_mode = "incremental",
+    project_name = "BazelSample",
+    tags = ["manual"],
+    top_level_targets = [
+        top_level_target(
+            "//:MySampleApp",
+            target_environments = ["simulator"],
+        ),
+    ],
+    xcschemes = SCHEMES,
 )
