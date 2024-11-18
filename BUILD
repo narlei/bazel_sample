@@ -50,11 +50,11 @@ ios_application(
 ######## Project ##########
 
 XCODEPROJ_FOCUSED_TARGETS = [
-    "//:MySampleApp",  # Comment this line to simulate working without the app on focus targets
+    "//:MySampleApp", 
     "//:MySampleSource",
     "//Libraries/LibraryA:LibraryACore",
     "//Libraries/LibraryA:LibraryAInterface",
-    "//Libraries/LibraryA:LibraryACoreTests",  # Adicionado aqui
+    "//Libraries/LibraryA:LibraryACoreTests",
 ]
 
 SCHEMES = [
