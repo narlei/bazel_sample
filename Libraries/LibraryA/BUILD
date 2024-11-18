@@ -1,4 +1,4 @@
-load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
+load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library", "swift_test")
 
 swift_library(
     name = "LibraryACore",
@@ -17,4 +17,13 @@ swift_library(
     srcs = glob(["Interface/*.swift"]),
     visibility = ["//visibility:public"],
     tags = ["manual"],
+)
+
+swift_test(
+    name = "LibraryACoreTests",
+    visibility = ["//visibility:public"],
+    srcs = glob(["Tests/*.swift"]),
+    deps = [
+        ":LibraryACore",
+    ],
 )
