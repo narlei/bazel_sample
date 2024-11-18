@@ -11,6 +11,29 @@ if [[ "$DEVELOPER_DIR" != /Applications/* ]]; then
   exit 1
 fi
 
+# Import environments when Bazel doesn't inherit from terminal
+if [ -f  ~/.steve.env ]; then
+  source ~/.steve.env
+fi
+
+# .bazelrc.extra
+extra_bazelrc_lines=()
+script_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Optimize Bazel startup, avoid fetching installed Xcodes
+xcode_build_number=$(/usr/bin/xcodebuild -version 2>/dev/null | tail -1 | cut -d " " -f3)
+xcode_config_file="$script_root/Config/bazel/xcode_selection/BUILD.bazel"
+
+# Check if current Xcode version exists in the BUILD.bazel file
+# We just abort the optimization otherwise. People should be able to use Xcode versions not listed in the BUILD.bazel file.
+if grep -q "$xcode_build_number" "$xcode_config_file"; then
+  extra_bazelrc_lines+=("common --xcode_version_config=//Config/bazel/xcode_selection:host_xcodes")
+  extra_bazelrc_lines+=("common --xcode_version=$xcode_build_number")
+fi
+
+# Generate the .bazelrc.extra file
+printf "%s\n" "${extra_bazelrc_lines[@]}" > "$script_root/.bazelrc.extra"
+
 # Only startup flags are allowed here
 flags=()
 
@@ -19,15 +42,11 @@ flags=()
 # https://bazelbuild.slack.com/archives/CD3QY5C2X/p1681824007249159?thread_ts=1681499279.013309&cid=CD3QY5C2X
 flags+=("--host_jvm_args=-Xdock:name=$DEVELOPER_DIR")
 
+
 # Shutdown Bazel Server after some minutes to avoid unnecessary Java processes lingering for too long
-# Ideally, we would set this flags in xcodeproj.bazelrc, but .bazelrc overwrites values from xcodeproj.bazelrc
 # The argument --output_base is what spawns a new Bazel Server, so it should be ok to check against it.
-if [[ "$@" =~ --output_base.*\/indexbuild_output_base ]]; then
-  # For Bazel spawned by rules_xcodeproj when indexing
-  flags+=("--max_idle_secs=300")
-elif [[ "$@" =~ --output_base.*\/build_output_base ]]; then
-  # For Bazel spawned by rules_xcodeproj when building
-  flags+=("--max_idle_secs=600")
+if [[ "$@" =~ --output_base.*\/build_output_base ]]; then
+  flags+=("--max_idle_secs=1200")
 fi
 
 W_BAZEL_BIN=$CONSUMER_BAZEL_PATH
